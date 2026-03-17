@@ -80,3 +80,5 @@ Se utiliza ASP.NET Identity para:
 El proyecto se encuentra en desarrollo, enfocado en la implementación de autenticación segura, gestión de usuarios y estructura base del sistema.
 
 ---
+
+JDiego
