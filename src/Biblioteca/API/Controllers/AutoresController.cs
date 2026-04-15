@@ -23,9 +23,12 @@ public class AutoresController(IAutorService _service) : ControllerBase
     [ProducesResponseType(typeof(PagedResult<DetailAutorDTO>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PagedResult<DetailAutorDTO>>> GetAutors(
-        [FromQuery] PaginationParams pagination)
+        
+        [FromQuery] FilterParams filters,
+        [FromQuery] PaginationParams pagination
+        )
     {
-        var result = await _service.GetAutorsAsync(pagination);
+        var result = await _service.GetAutorsAsync(filters, pagination);
         return Ok(result);
     }
 

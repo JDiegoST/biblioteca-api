@@ -43,7 +43,7 @@ namespace Biblioteca.Aplication.Services
                  new ("NameIdentifier", $"{identityUser.Id}")
              });
 
-            var tokenRefresh = await SaveRefreshTokenDB(identityUser.Id, ipAddress!);
+            var tokenRefresh = await SaveNewRefreshTokenDB(identityUser.Id, ipAddress!);
 
             return new TokenResultDTO()
             {
@@ -63,8 +63,11 @@ namespace Biblioteca.Aplication.Services
                 .FirstOrDefaultAsync() ??
                 throw new UnauthorizedException("Recurso no disponible. Vuelve a iniciar sesion.");
 
-            if (refreshTokenFromDB.ExpiresAt > DateTime.Now)
+            if (refreshTokenFromDB.ExpiresAt >= DateTime.Now)
+            {
                 refreshTokenFromDB.RevokedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
+            }
 
             if (refreshTokenFromDB.IsExpired)
                 throw new UnauthorizedException("Sesion caducada. Vuelve a iniciar sesion.");
@@ -81,7 +84,7 @@ namespace Biblioteca.Aplication.Services
                  new ("UserId", $"{identiyUser.Id}")
             });
 
-            string newRefreshToken = await SaveRefreshTokenDB(identiyUser.Id, ipAddress);
+            string newRefreshToken = await SaveNewRefreshTokenDB(identiyUser.Id, ipAddress);
 
             return new LoginResponseDTO()
             {
@@ -180,7 +183,7 @@ namespace Biblioteca.Aplication.Services
         /// <param name="ipOrigen">
         ///     Utilizado para el registro de acciones (logger) para ver desde donde se intento hacer la accion.
         /// </param>
-        private async Task<string> SaveRefreshTokenDB(Guid identityId, string ipOrigen)
+        private async Task<string> SaveNewRefreshTokenDB(Guid identityId, string ipOrigen)
         {
             string refreshToken = _tokenService.GenerateRefreshToken();
 
@@ -197,10 +200,11 @@ namespace Biblioteca.Aplication.Services
 
             RefreshToken? refreshTokenToUser = await _context.RefreshTokens
                 .Where(rt => rt.IdentityUserId == identityId)
+                .OrderBy(r => r.CreatedAt).OrderDescending()
                 .FirstOrDefaultAsync();
 
             if (refreshTokenToUser is not null) 
-                newRefreshToken.ReplacedByTokenId = refreshTokenToUser.Id;
+                refreshTokenToUser.ReplacedByTokenId = newRefreshToken.Id;
 
             await _context.RefreshTokens.AddAsync(newRefreshToken);
 

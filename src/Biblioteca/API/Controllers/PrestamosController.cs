@@ -48,7 +48,7 @@ namespace Biblioteca.API.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<DetailPrestamoDTO>> GetLoanById(Guid id)
         {
-            if (!ManagerLimitationsForRoles.CheckAccessResourceForRol(User, id)) return Forbid("No cuentas con los permisos necesarios");
+            if (!ManagerLimitationsForRoles.CheckAccessResourceForRol(User, id)) return Forbid("No tienes permiso.");
 
             var result = await _service.GetLoanByIdAsync(id);
             return Ok(result);

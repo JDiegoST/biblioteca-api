@@ -12,6 +12,7 @@ namespace Biblioteca.API.Configurations
             services.AddScoped<IEjemplarService, EjemplarService>();
             services.AddScoped<IUsuarioService, UsuarioService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IBuscador, BuscadorService>();
 
             services.AddSingleton<ITokenService, TokenService>();
 

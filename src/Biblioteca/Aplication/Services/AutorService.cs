@@ -18,16 +18,24 @@ public class AutorService(BibliotecaContext _context) : IAutorService
    /// <param name="pagination">
    ///      Contiene la informacion esencial para aplicar paginacion en la consulta.
    /// </param>
+   /// <param name="filters">
+   ///      Contiene la informacion esencial de la busqueda concreata en autores.
+   /// </param>
    /// <returns>
    ///      Retorna el objeto PagedResult que contiene informacion con la cantidad y los 
    ///      registros encontrados ademas de informacion adicional sobre la paginacion.
    /// </returns>
-    public async Task<PagedResult<DetailAutorDTO>> GetAutorsAsync( PaginationParams pagination)
+    public async Task<PagedResult<DetailAutorDTO>> GetAutorsAsync(FilterParams filters, PaginationParams pagination)
     {
-
         var query = _context.Autores
             .AsNoTracking()
-            .OrderBy(a => a.Apellido);
+            .OrderBy(a => a.Apellido).AsQueryable();
+
+        if (!String.IsNullOrEmpty(filters.Q))
+        {
+            query = query.
+                    Where(a => EF.Functions.Like(a.Nombre.ToLower() + " " +a.Apellido.ToLower() , $"%{filters.Q.ToLower()}%"));
+        }
 
         var totalItems = await query.CountAsync();
 

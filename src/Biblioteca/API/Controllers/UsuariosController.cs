@@ -16,7 +16,7 @@ namespace Biblioteca.API.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class UsuarioController (IUsuarioService _service) : ControllerBase
+    public class UsuariosController (IUsuarioService _service) : ControllerBase
     {
         /// <summary>
         ///     Lista todos los usuarios existentes.
@@ -55,7 +55,7 @@ namespace Biblioteca.API.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<DetailUsuarioDTO>> GetUsuarioById(Guid id)
         {
-            if (!ManagerLimitationsForRoles.CheckAccessResourceForRol(User, id)) return Forbid("No cuentas con los permisos necesarios");
+            if (!ManagerLimitationsForRoles.CheckAccessResourceForRol(User, id)) return Forbid("No tienes Acceso a este recurso.");
 
             var userFound = await _service.GetUsuarioByIdAsync(id);
 

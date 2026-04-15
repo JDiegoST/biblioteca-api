@@ -1,6 +1,8 @@
 ﻿using Biblioteca.Aplication.DTOs.common;
 using Biblioteca.Aplication.DTOs.Ejemplares;
 using Biblioteca.Aplication.Interfaces;
+using Biblioteca.Domain.Models.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Biblioteca.API.Controllers
@@ -19,6 +21,7 @@ namespace Biblioteca.API.Controllers
         /// <param name="pagination">Parametros de paginacion.</param>
         /// <response code="200">Ejemplares obtenidos correctamente.</response>
         /// <response code="400">Datos de consulta invalidos (ProblemDetails).</response>
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(typeof(PagedResult<DetailEjemplarDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -47,46 +50,12 @@ namespace Biblioteca.API.Controllers
         }
 
         /// <summary>
-        ///     Verifica la disponibilidad de un ejemplar para ser prestado.
-        /// </summary>
-        /// <param name="ejemplarId">Id del ejemplar.</param>
-        /// <response code="200">Estado de diponibilidad obtenido.</response>
-        /// <response code="400">Id invalido (ProblemDetails).</response>
-        /// <response code="404">Ejemplar no encontrado (ProblemDetails).</response>
-        [HttpGet("{ejemplarId}/disponbilidad")]
-        [ProducesResponseType(typeof(DetailEjemplarDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<CheckAvailabilityEjemplar>> GetEjemplarAvailability(Guid ejemplarId)
-        {
-            var available = await _service.FastCheckEjemplarAvailableAsync(ejemplarId);
-
-            return Ok(available);
-        }
-
-        /// <summary>
-        ///     Obtiene la lista de ejemplares disponibles de un libro por ID
-        /// </summary>
-        /// <param name="libroId">Id del Libro.</param>
-        /// <response code="200">Lista de ejemplares disponibles obtenida.</response>
-        /// <response code="400">Id invalido (ProblemDetails).</response>
-        [HttpGet("/disponible")]
-        [ProducesResponseType(typeof(DetailEjemplarDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<CheckListEjemplaresAvailable>> GetEjemplaresAvailableByLibro(
-            [FromQuery] Guid libroId)
-        {
-            var listEjemplares = await _service.CheckEjemplaresAvailableByLibroIdAsync(libroId);
-
-            return Ok(listEjemplares);
-        }
-
-        /// <summary>
         ///     Crea un nuevo ejemplar.
         /// </summary>
         /// <param name="ejemplarDTO">Datos del ejemplar a crear.</param>
         /// <response code="201">Ejemplar creado correctamente.</response>
         /// <response code="400">Datos invalidos (ProblemDetails).</response>
+        [Authorize(Roles = nameof(Rol.Administrador))]
         [HttpPost]
         [ProducesResponseType(typeof(DetailEjemplarDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -108,11 +77,12 @@ namespace Biblioteca.API.Controllers
         /// <response code="204">Actualizado correctamente (sin contenido).</response>
         /// <response code="400">Datos invalidos (ProblemDetails).</response>
         /// <response code="404">Ejemplar no encontrado (ProblemDetails).</response>
+        [Authorize(Roles = nameof(Rol.Administrador))]
         [HttpPatch("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PutEjemplar(Guid id, [FromBody] UpdateEjemplarDTO ejemplar)
+        public async Task<IActionResult> PatchEjemplar(Guid id, [FromBody] UpdateEjemplarDTO ejemplar)
         {
             await _service.UpdateEjemplarAsync(id, ejemplar);
             return NoContent();
@@ -125,6 +95,7 @@ namespace Biblioteca.API.Controllers
         /// <response code="204">Eliminado correctamente (sin contenido).</response>
         /// <response code="400">Id invalido (ProblemDetails).</response>
         /// <response code="404">Ejemplar no encontrado (ProblemDetails).</response>
+        [Authorize(Roles = nameof(Rol.Administrador))]
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

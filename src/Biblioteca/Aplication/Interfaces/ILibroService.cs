@@ -5,7 +5,7 @@ namespace Biblioteca.Aplication.Interfaces
 {
     public interface ILibroService
     {
-        Task<PagedResult<DetalleLibroDTO>> GetLibrosAsync(PaginationParams pagination);
+        Task<PagedResult<DetalleLibroDTO>> GetLibrosAsync(FilterParams filters, PaginationParams pagination);
         Task<DetalleLibroDTO?> GetLibroByIdAsync(Guid id);
         Task<DetalleLibroDTO> CreateNewLibroAsync(CreateNewLibroDTO newlibro);
         Task UpdateLibroAsync(Guid id, UpdateLibroDTO libroToUpdate);

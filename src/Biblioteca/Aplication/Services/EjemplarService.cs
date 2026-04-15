@@ -70,57 +70,6 @@ namespace Biblioteca.Aplication.Services
                 }
             } ).FirstOrDefaultAsync() ?? throw new NotFoundException($"Ejemplar con Id: '{id}' no encontrado.");
         }
-
-        /// <summary>
-        ///     Verifica y retorna un valor booleano en caso de que el ejemplar buscado a partir de el parametro ID
-        ///     se encuentra actualmente DISPONIBLE para ser prestado.
-        /// </summary>
-        /// <param name="ejemplarId">
-        ///     Representa el Id que tiene el ejemplar buscado.
-        /// </param>
-        /// <returns></returns>
-        public async Task<CheckAvailabilityEjemplar> FastCheckEjemplarAvailableAsync(Guid ejemplarId)
-        {
-            var loanSearched = await _context.Ejemplares
-                .Where(e => e.EjemplarId == ejemplarId)
-                .Select(e => e.Estado)
-                .FirstOrDefaultAsync()
-                ?? throw new NotFoundException($"Ejemplar id: '{ejemplarId}' no encontrado.");
-
-            return new CheckAvailabilityEjemplar() {
-                Disponible = loanSearched == EstadoPrestamo.Disponible
-            };
-        }
-
-        /// <summary>
-        ///     Verifica si un libro especifico tiene uno o varios ejemplares disponibles para
-        ///     que alguno de ellos sea prestado.
-        /// </summary>
-        /// <param name="libroId">
-        ///     Representa el ID que tiene un libro especifico en la BD.
-        /// </param>
-        /// <returns></returns>
-        public async Task<CheckListEjemplaresAvailable> CheckEjemplaresAvailableByLibroIdAsync(Guid libroId)
-        {
-            var ejemplaresBuscados = await _context.Ejemplares
-                .AsNoTracking()
-                .Where(e => e.LibroId == libroId && e.Estado == EstadoPrestamo.Disponible)
-                .Select(e => new DetailEjemplarDTO()
-                {
-                    EjemplarId = e.EjemplarId,
-                    CodigoInventario = e.CodigoInventario,
-                    Estado = e.Estado,
-                    Libro = new SummaryLibroResumenDTO()
-                    {
-                        Titulo = e.Libro.Titulo,
-                    }
-                }).ToListAsync();
-
-            return new CheckListEjemplaresAvailable()
-            {
-                EjemplaresDisponibles = ejemplaresBuscados
-            };
-        }
         
         /// <summary>
         ///     Inserta un nuevo ejemplar en la base de datos a partir de los datos enviados 

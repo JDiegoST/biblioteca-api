@@ -2,7 +2,7 @@
 
 namespace Biblioteca.Aplication.DTOs.common
 {
-    public class PaginationParams
+    public class PaginationParams : Params
     {
         private const int MaxPageSize = PaginationPolicy.MAX_PAGE_SIZE;
 

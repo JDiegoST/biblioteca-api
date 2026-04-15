@@ -39,15 +39,15 @@ namespace Biblioteca.API.Controllers
 
             RegisterResponseDTO result = await _service.AuthRegisterAsync(dto, clientOrigin!);
 
-            var url = Url.Action(nameof(UsuarioController.GetUsuarioById), new { id = result.UsuarioId });
+            var url = Url.Action(nameof(UsuariosController.GetUsuarioById), new { id = result.UsuarioId });
 
             return Created(url, null);
 
         }
 
 
-        [HttpGet("refresh")]
-        public async Task<IActionResult> GetRefreshToken()
+        [HttpPost("refresh")]
+        public async Task<IActionResult> PostRefreshToken()
         {
             string ipAddress = HttpContext.Connection.RemoteIpAddress!.ToString();
 
@@ -61,6 +61,7 @@ namespace Biblioteca.API.Controllers
 
         }
 
+        [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> PostLogout()
         {

@@ -5,6 +5,7 @@ using Biblioteca.Aplication.Interfaces;
 using Biblioteca.Infrastructure.Context;
 using Biblioteca.Domain.Models;
 using Biblioteca.Domain.Exceptions;
+using Biblioteca.Domain.Models.Enums;
 
 namespace Biblioteca.Aplication.Services;
 public class LibroService(BibliotecaContext _context) : ILibroService
@@ -20,12 +21,24 @@ public class LibroService(BibliotecaContext _context) : ILibroService
     ///     Retorna un objeto PagedResutl que ademas de la cantidad y los elementos encontrados,
     ///     contiene informacion importante acerca de la paginacion.
     /// </returns>
-    public async Task<PagedResult<DetalleLibroDTO>> GetLibrosAsync(PaginationParams pagination)
+    public async Task<PagedResult<DetalleLibroDTO>> GetLibrosAsync(FilterParams filters, PaginationParams pagination)
     {
 
         var query = _context.Libros
             .AsNoTracking()
-            .OrderBy(l => l.Titulo);
+            .OrderBy(l => l.Titulo).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filters.Q))
+        {
+            query = query.Where(l =>
+                EF.Functions.Like(l.Titulo, $"%{filters.Q}%"));
+        }
+
+        if (filters.Disponible.HasValue)
+        {
+            query = query.Where(l =>
+                l.Ejemplares.ToList().Where(e => e.Estado == EstadoPrestamo.Disponible).Any());
+        }
 
         var totalItems = await query.CountAsync();
 

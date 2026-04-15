@@ -6,7 +6,7 @@ namespace Biblioteca.Aplication.Interfaces
 {
     public interface IAutorService
     {
-        Task<PagedResult<DetailAutorDTO>> GetAutorsAsync(PaginationParams pagination);
+        Task<PagedResult<DetailAutorDTO>> GetAutorsAsync(FilterParams filters, PaginationParams pagination);
         Task<DetailAutorDTO?> GetAutorByIdAsync(Guid id);
 
         Task<PagedResult<SummaryLibroResumenDTO>> GetLibrosOfAutor(Guid autorId, PaginationParams pagination);

@@ -17,16 +17,18 @@ namespace Biblioteca.API.Controllers
         ///     Lista todos los libros existentes (paginado).
         /// </summary>
         /// <param name="pagination">Parámetros de paginación.</param>
+        /// <param name="filters">Posibles filtros de la consulta.</param>
         /// <response code="200">Libros obtenidos correctamente.</response>
         /// <response code="400">Datos de consulta invalidos (ProblemDetails).</response>
         [HttpGet]
         [ProducesResponseType(typeof(PagedResult<DetalleLibroDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<PagedResult<DetalleLibroDTO>>> GetLibros(
+            [FromQuery] FilterParams filters,
             [FromQuery] PaginationParams pagination
         )
         {
-            var resultado = await _service.GetLibrosAsync(pagination);
+            var resultado = await _service.GetLibrosAsync(filters, pagination);
             return Ok(resultado);
         }
 
